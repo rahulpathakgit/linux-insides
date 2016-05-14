@@ -4,7 +4,7 @@ Kernel initialization. Part 9.
 RCU initialization
 ================================================================================
 
-This is ninth part of the [Linux Kernel initialization process](http://0xax.gitbooks.io/linux-insides/content/Initialization/index.html) and in the previous part we stopped at the [scheduler initialization](http://0xax.gitbooks.io/linux-insides/content/Initialization/linux-initialization-8.html). In this part we will continue to dive to the linux kernel initialization process and the main purpose of this part will be to learn about initialization of the [RCU](http://en.wikipedia.org/wiki/Read-copy-update). We can see that the next step in the [init/main.c](https://github.com/torvalds/linux/blob/master/init/main.c) after the `sched_init` is the call of the `preempt_disablepreempt_disable`. There are two macros:
+This is ninth part of the [Linux Kernel initialization process](http://0xax.gitbooks.io/linux-insides/content/Initialization/index.html) and in the previous part we stopped at the [scheduler initialization](http://0xax.gitbooks.io/linux-insides/content/Initialization/linux-initialization-8.html). In this part we will continue to dive to the linux kernel initialization process and the main purpose of this part will be to learn about initialization of the [RCU](http://en.wikipedia.org/wiki/Read-copy-update). We can see that the next step in the [init/main.c](https://github.com/torvalds/linux/blob/master/init/main.c) after the `sched_init` is the call of the `preempt_disable`. There are two macros:
 
 * `preempt_disable`
 * `preempt_enable`
@@ -38,7 +38,7 @@ In the first implementation of the `preempt_disable` we increment this `__preemp
 #define preempt_count_add(val)  __preempt_count_add(val)
 ```
 
-where `preempt_count_add` calls the `raw_cpu_add_4` macro which adds `1` to the given `percpu` variable (`__preempt_count`) in our case (more about `precpu` variables you can read in the part about [Per-CPU variables](http://0xax.gitbooks.io/linux-insides/content/Concepts/per-cpu.html)). Ok, we increased `__preempt_count` and th next step we can see the call of the `barrier` macro in the both macros. The `barrier` macro inserts an optimization barrier. In the processors with `x86_64` architecture independent memory access operations can be performed in any order. That's why we need the oportunity to point compiler and processor on compliance of order. This mechanism is memory barrier. Let's consider a simple example:
+where `preempt_count_add` calls the `raw_cpu_add_4` macro which adds `1` to the given `percpu` variable (`__preempt_count`) in our case (more about `precpu` variables you can read in the part about [Per-CPU variables](http://0xax.gitbooks.io/linux-insides/content/Concepts/per-cpu.html)). Ok, we increased `__preempt_count` and th next step we can see the call of the `barrier` macro in the both macros. The `barrier` macro inserts an optimization barrier. In the processors with `x86_64` architecture independent memory access operations can be performed in any order. That's why we need the opportunity to point compiler and processor on compliance of order. This mechanism is memory barrier. Let's consider a simple example:
 
 ```C
 preempt_disable();
